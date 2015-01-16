@@ -26,7 +26,7 @@
 )
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'classic t)
+(load-theme 'gnome2 t)
 (set-face-background 'fringe (face-background 'default))
 
 (require 'powerline)
@@ -47,7 +47,8 @@
 
 ;; font
 ;;
-(set-face-attribute 'default nil :font "Aurulent Sans Mono-16")
+(set-face-attribute 'default nil :font "Inconsolata-16")
+;; (set-face-attribute 'default nil :font "Aurulent Sans Mono-16")
 
 
 ;; tab
@@ -69,7 +70,7 @@
 ;; evil
 (evil-mode 1)
 
-;; missing gp
+;; the missing gp
 (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
 
 (defun my-list-buffers()
@@ -78,7 +79,19 @@
   (buffer-menu))
 (evil-ex-define-cmd "bs" 'my-list-buffers)
 
-(global-set-key (kbd "M-t") 'anything)
+(defun my-insert-time-stamp()
+    (interactive)
+    (insert (current-time-string)))
+(evil-ex-define-cmd "ts" 'my-insert-time-stamp)
+    
+;; cmd-t
+;; (require 'textmate)
+;; (require 'peepopen)
+;; (textmate-mode)
+;; (global-set-key (kbd "M-t") 'helm-M-x)
+(require 'helm-cmd-t)
+(global-set-key (kbd "M-t") 'helm-cmd-t)
+
 (defun my-list-files()
   (interactive)
   (when (buffer-file-name)
@@ -86,7 +99,7 @@
     (dired (file-name-directory (buffer-file-name))))
 )
 (evil-ex-define-cmd "fs" 'my-list-files)
-
+    
 ;; escape!
 (defun minibuffer-keyboard-quit ()
   "Abort recursive edit.
@@ -105,13 +118,14 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+
 ;; cursor
-(setq evil-emacs-state-cursor '("red" box))
-(setq evil-normal-state-cursor '("green" box))
-(setq evil-visual-state-cursor '("orange" box))
-(setq evil-insert-state-cursor '("red" bar))
-(setq evil-replace-state-cursor '("red" bar))
-(setq evil-operator-state-cursor '("red" hollow))
+;; (setq evil-emacs-state-cursor '("red" box))
+;; (setq evil-normal-state-cursor '("green" box))
+;; (setq evil-visual-state-cursor '("orange" box))
+;; (setq evil-insert-state-cursor '("red" bar))
+;; (setq evil-replace-state-cursor '("red" bar))
+;; (setq evil-operator-state-cursor '("red" hollow))
 
 ;; comment
 (global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
@@ -156,7 +170,32 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;; ace-jump
 (global-set-key (kbd "M-p") 'ace-window)
 
+;; toggle window split
+(defun toggle-frame-split ()
+  "If the frame is split vertically, split it horizontally or vice versa.
+Assumes that the frame is only split into two."
+  (interactive)
+  (unless (= (length (window-list)) 2) (error "Can only toggle a frame split in two"))
+  (let ((split-vertically-p (window-combined-p)))
+    (delete-window) ; closes current window
+    (if split-vertically-p
+        (split-window-horizontally)
+      (split-window-vertically)) ; gives us a split with the other window twice
+    (switch-to-buffer nil))) ; restore the original window in this part of the frame
+
+;; I don't use the default binding of 'C-x 5', so use toggle-frame-split instead
+(global-set-key (kbd "M-g") 'toggle-frame-split)
+
 ;; ido
 (require 'ido)
 (ido-mode 1)
 (setq ido-enable-flex-matching t)
+
+;; org
+(setq org-agenda-files (list "~/Documents/org/work.org"
+                             "~/Documents/org/home.org"))
+(server-mode)
+
+(cd "~/Documents/work")
+;; Installed packages;
+;; (auto-complete popup auto-complete popup popup ace-window ace-jump-mode ace-window flycheck let-alist pkg-info epl dash flycheck flycheck-rust dash flycheck let-alist pkg-info epl dash flycheck-rust helm async helm magit git-rebase-mode git-commit-mode magit org-context org-context ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-window ace-jump-mode bliss-theme evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-tutor evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash flymake-css flymake-easy flymake-go flymake flymake-json flymake-easy flymake-less less-css-mode flymake-ruby flymake-easy flymake-rust flymake-easy flymake-sass flymake-easy go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-flymake helm async helm-google google helm async helm-rb helm-ag-r helm async helm async json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash undo-tree visual-regexp yasnippet yaxception)
