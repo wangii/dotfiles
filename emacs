@@ -6,7 +6,32 @@
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/"))
 
+
+;; (setq pkgs '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-window ace-jump-mode bliss-theme cycbuf evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-tutor evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree fic-ext-mode flycheck-rust dash flycheck let-alist pkg-info epl dash flymake-css flymake-easy flymake-go flymake flymake-json flymake-easy flymake-less less-css-mode flymake-ruby flymake-easy flymake-rust flymake-easy flymake-sass flymake-easy go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-flymake helm async helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp yasnippet yaxception))
+
+;; ;; http://stackoverflow.com/questions/10092322/how-to-automatically-install-emacs-packages-by-specifying-a-list-of-package-name
+
+;; (defun ensure-packages-installed (packages)
+;;   "Assure every package is installed, ask for installation if it’s not.
+;; Return a list of installed packages or nil for every skipped package."
+;;   (mapcar
+;;    (lambda (package)
+;;      ;; (package-installed-p 'evil)
+;;      (if (package-installed-p package)
+;;          nil
+;;        (package-install package))
+;;    packages)))
+
+;; ;; make sure to have downloaded archive description.
+;; ;; Or use package-archive-contents as suggested by Nicolas Dudebout
+;; (or (file-exists-p package-user-dir)
+;;     (package-refresh-contents))
+
+;; (ensure-packages-installed pkgs) ;  --> (nil nil) if iedit and magit are already installed
+
 (package-initialize)           
+
+;; Installed packages;
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -15,30 +40,34 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("c5a044ba03d43a725bd79700087dea813abcb6beb6be08c7eb3303ed90782482" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" default))))
+    ;; ("c5a044ba03d43a725bd79700087dea813abcb6beb6be08c7eb3303ed90782482" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default))))
+    ("6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default))))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- ;; '(linum ((t (:inherit (shadow default) :background "knobColor" :foreground "highlightColor")))))
-)
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  )
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'gnome2 t)
+(load-theme 'monokai t)
 (set-face-background 'fringe (face-background 'default))
 
 (require 'powerline)
-(powerline-evil-vim-color-theme)
+;; (powerline-evil-vim-color-theme)
+(powerline-center-theme)
 (display-time-mode t)
 
 ;; UI
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 ;; (menu-bar-mode -1)
-
 (global-linum-mode 1)
+
+(require 'highlight-current-line)
+(set-face-background 'highlight-current-line-face "darkslategray")
+(highlight-current-line-on t)
 
 ;; (set-fringe-mode '(0 . 0))
 
@@ -47,8 +76,10 @@
 
 ;; font
 ;;
-(set-face-attribute 'default nil :font "Inconsolata-16")
-;; (set-face-attribute 'default nil :font "Aurulent Sans Mono-16")
+(set-face-attribute 'default nil :font "Consolas-15")
+;; (set-face-attribute 'default nil :font "Inconsolata\-g-15")
+;; (set-face-attribute 'default nil :font "Source Code Pro-15")
+;; (set-face-attribute 'default nil :font "Aurulent Sans Mono-15")
 
 
 ;; tab
@@ -69,6 +100,7 @@
 
 ;; evil
 (evil-mode 1)
+(global-evil-visualstar-mode t)
 
 ;; the missing gp
 (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
@@ -85,10 +117,6 @@
 (evil-ex-define-cmd "ts" 'my-insert-time-stamp)
     
 ;; cmd-t
-;; (require 'textmate)
-;; (require 'peepopen)
-;; (textmate-mode)
-;; (global-set-key (kbd "M-t") 'helm-M-x)
 (require 'helm-cmd-t)
 (global-set-key (kbd "M-t") 'helm-cmd-t)
 
@@ -149,6 +177,11 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;; js2
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
+;; node repl
+(require 'nodejs-repl)
+(setq nodejs-repl-command "/usr/local/bin/node")
+
+
 ;; auto-complete
 (require 'auto-complete)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/dict")
@@ -196,6 +229,25 @@ Assumes that the frame is only split into two."
                              "~/Documents/org/home.org"))
 (server-mode)
 
-(cd "~/Documents/work")
-;; Installed packages;
-;; (auto-complete popup auto-complete popup popup ace-window ace-jump-mode ace-window flycheck let-alist pkg-info epl dash flycheck flycheck-rust dash flycheck let-alist pkg-info epl dash flycheck-rust helm async helm magit git-rebase-mode git-commit-mode magit org-context org-context ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-window ace-jump-mode bliss-theme evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-tutor evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash flymake-css flymake-easy flymake-go flymake flymake-json flymake-easy flymake-less less-css-mode flymake-ruby flymake-easy flymake-rust flymake-easy flymake-sass flymake-easy go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-flymake helm async helm-google google helm async helm-rb helm-ag-r helm async helm async json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash undo-tree visual-regexp yasnippet yaxception)
+;; (cd "~/Documents/work")
+(setq command-line-default-directory "~/Documents/work")
+
+(require 'cycbuf)
+(global-set-key (kbd "C->") 'cycbuf-switch-to-next-buffer)
+(global-set-key (kbd "C-<") 'cycbuf-switch-to-previous-buffer)
+
+;; (setq pkgs (list'ac-dabbrev 'ac-helm 'popup 'auto-complete 'popup 'helm 'async 'ac-html 'auto-complete 'popup 'ac-inf-ruby 'auto-complete 'popup 'inf-ruby 'ac-js2 'skewer-mode 'js2-mode 'simple-httpd 'js2-mode 'ace-window 'ace-jump-mode 'bliss-theme 'cycbuf 'evil-leader 'evil 'goto-chg 'undo-tree 'evil-nerd-commenter 'evil-org 'org 'evil 'goto-chg 'undo-tree 'evil-tutor 'evil 'goto-chg 'undo-tree 'evil-visualstar 'evil 'goto-chg 'undo-tree 'flycheck-rust 'dash 'flycheck 'let-alist 'pkg-info 'epl 'dash 'flymake-css 'flymake-easy 'flymake-go 'flymake 'flymake-json 'flymake-easy 'flymake-less 'less-css-mode 'flymake-ruby 'flymake-easy 'flymake-rust 'flymake-easy 'flymake-sass 'flymake-easy 'go-autocomplete 'auto-complete 'popup 'go-direx 'direx 'go-mode 'golint 'helm-cmd-t 'helm-css-scss 'helm 'async 'helm-flycheck 'helm 'async 'flycheck 'let-alist 'pkg-info 'epl 'dash 'dash 'helm-flymake 'helm 'async 'helm-rb 'helm-ag-r 'helm 'async 'helm 'async 'highlight-current-line 'inf-ruby 'json-mode 'json-snatcher 'json-reformat 'json-reformat 'json-snatcher 'less-css-mode 'let-alist 'magit 'git-rebase-mode 'git-commit-mode 'markdown-mode 'monokai-theme 'nodejs-repl 'nyan-mode 'org-ac 'yaxception 'log4e 'auto-complete-pcmp 'yaxception 'log4e 'auto-complete 'popup 'org-agenda-property 'org-autolist 'org-blog 'org-bullets 'org-caldav 'org 'org-cliplink 'org-context 'pkg-info 'epl 'popup 'powerline-evil 'powerline 'evil 'goto-chg 'undo-tree 'qml-mode 'ruby-additional 'rust-mode 'skewer-mode 'js2-mode 'simple-httpd 'smart-mode-line 'rich-minority 'dash 'sokoban 'tron-theme 'undo-tree 'visual-regexp 'yasnippet 'yaxception))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
