@@ -7,7 +7,7 @@
              '("marmalade" . "http://marmalade-repo.org/packages/"))
 
 
-;; (setq pkgs '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-window ace-jump-mode bliss-theme cycbuf evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-tutor evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree fic-ext-mode flycheck-rust dash flycheck let-alist pkg-info epl dash flymake-css flymake-easy flymake-go flymake flymake-json flymake-easy flymake-less less-css-mode flymake-ruby flymake-easy flymake-rust flymake-easy flymake-sass flymake-easy go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-flymake helm async helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp yasnippet yaxception))
+;; (setq pkgs '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-window ace-jump-mode bliss-theme cycbuf evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-tutor evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash flymake-css flymake-easy flymake-go flymake flymake-json flymake-easy flymake-less less-css-mode flymake-ruby flymake-easy flymake-rust flymake-easy flymake-sass flymake-easy go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-flymake helm async helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp yasnippet yaxception))
 
 ;; ;; http://stackoverflow.com/questions/10092322/how-to-automatically-install-emacs-packages-by-specifying-a-list-of-package-name
 
@@ -50,6 +50,10 @@
 ;;  ;; If there is more than one, they won't work right.
 ;;  )
 
+;; org to md
+(eval-after-load "org"
+  '(require 'ox-md nil t))
+
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (load-theme 'monokai t)
 (set-face-background 'fringe (face-background 'default))
@@ -62,8 +66,9 @@
 ;; UI
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-;; (menu-bar-mode -1)
+
 (global-linum-mode 1)
+(electric-pair-mode 1)
 
 (require 'highlight-current-line)
 (set-face-background 'highlight-current-line-face "darkslategray")
@@ -76,8 +81,19 @@
 
 ;; font
 ;;
-(set-face-attribute 'default nil :font "Consolas-15")
+;; (set-face-attribute 'default nil :font "Consolas-15")
+;; (set-face-attribute 'default nil :font "Anonymous Pro-15")
 ;; (set-face-attribute 'default nil :font "Inconsolata\-g-15")
+;; (set-face-attribute 'default nil :font "Liberation Mono-15")
+;; (set-face-attribute 'default nil :font "Bitstream Versa Sans Mono-15")
+;; (set-face-attribute 'default nil :font "Lucida Mono-15")
+;; (set-face-attribute 'default nil :font "TextMateJ-15")
+;; (set-face-attribute 'default nil :font "TheSansMono\-ExtraLight-15")
+;; (set-face-attribute 'default nil :font "InputMono-15")
+;; (set-face-attribute 'default nil :font "Akkurat\-Mono-15")
+(set-face-attribute 'default nil :font "Droid Sans Mono-15")
+;; (set-face-attribute 'default nil :font "Ubuntu Mono-16")
+;; (set-face-attribute 'default nil :font "BPMono-15")
 ;; (set-face-attribute 'default nil :font "Source Code Pro-15")
 ;; (set-face-attribute 'default nil :font "Aurulent Sans Mono-15")
 
@@ -98,6 +114,9 @@
 (setq make-backup-files nil) ; stop creating backup~ files
 (setq auto-save-default nil) ; stop creating #autosave# files
 
+;; fixme-todo-bug
+;(fic-ext-mode)
+
 ;; evil
 (evil-mode 1)
 (global-evil-visualstar-mode t)
@@ -105,11 +124,12 @@
 ;; the missing gp
 (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
 
-(defun my-list-buffers()
-  (interactive)
-  (split-window-horizontally)
-  (buffer-menu))
-(evil-ex-define-cmd "bs" 'my-list-buffers)
+;; (defun my-list-buffers()
+;;   (interactive)
+;;   (split-window-horizontally)
+;;   (buffer-menu))
+
+(evil-ex-define-cmd "bs" 'lw/popup-select-buffer)
 
 (defun my-insert-time-stamp()
     (interactive)
@@ -119,6 +139,14 @@
 ;; cmd-t
 (require 'helm-cmd-t)
 (global-set-key (kbd "M-t") 'helm-cmd-t)
+
+(defun lw/popup-select-buffer()
+  (interactive)
+    (let ((bn (popup-menu* (mapcar 'buffer-name (buffer-list)) :isearch t)))
+      (switch-to-buffer (get-buffer bn))
+      )
+    )
+(global-set-key (kbd "M-p") 'lw/popup-select-buffer)
 
 (defun my-list-files()
   (interactive)
@@ -148,12 +176,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
 ;; cursor
-;; (setq evil-emacs-state-cursor '("red" box))
-;; (setq evil-normal-state-cursor '("green" box))
-;; (setq evil-visual-state-cursor '("orange" box))
-;; (setq evil-insert-state-cursor '("red" bar))
-;; (setq evil-replace-state-cursor '("red" bar))
-;; (setq evil-operator-state-cursor '("red" hollow))
+(setq evil-emacs-state-cursor '("red" box))
+(setq evil-normal-state-cursor '("green" box))
+(setq evil-visual-state-cursor '("orange" box))
+(setq evil-insert-state-cursor '("red" bar))
+(setq evil-replace-state-cursor '("red" bar))
+(setq evil-operator-state-cursor '("red" hollow))
 
 ;; comment
 (global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
@@ -201,7 +229,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (sml/apply-theme 'dark)
 
 ;; ace-jump
-(global-set-key (kbd "M-p") 'ace-window)
+;; (global-set-key (kbd "M-p") 'ace-window)
 
 ;; toggle window split
 (defun toggle-frame-split ()
@@ -222,6 +250,7 @@ Assumes that the frame is only split into two."
 ;; ido
 (require 'ido)
 (ido-mode 1)
+(setq ido-separator "\n")
 (setq ido-enable-flex-matching t)
 
 ;; org
@@ -232,22 +261,22 @@ Assumes that the frame is only split into two."
 ;; (cd "~/Documents/work")
 (setq command-line-default-directory "~/Documents/work")
 
-(require 'cycbuf)
-(global-set-key (kbd "C->") 'cycbuf-switch-to-next-buffer)
-(global-set-key (kbd "C-<") 'cycbuf-switch-to-previous-buffer)
+;; (require 'cycbuf)
+;; (global-set-key (kbd "C->") 'cycbuf-switch-to-next-buffer)
+;; (global-set-key (kbd "C-<") 'cycbuf-switch-to-previous-buffer)
 
-;; (setq pkgs (list'ac-dabbrev 'ac-helm 'popup 'auto-complete 'popup 'helm 'async 'ac-html 'auto-complete 'popup 'ac-inf-ruby 'auto-complete 'popup 'inf-ruby 'ac-js2 'skewer-mode 'js2-mode 'simple-httpd 'js2-mode 'ace-window 'ace-jump-mode 'bliss-theme 'cycbuf 'evil-leader 'evil 'goto-chg 'undo-tree 'evil-nerd-commenter 'evil-org 'org 'evil 'goto-chg 'undo-tree 'evil-tutor 'evil 'goto-chg 'undo-tree 'evil-visualstar 'evil 'goto-chg 'undo-tree 'flycheck-rust 'dash 'flycheck 'let-alist 'pkg-info 'epl 'dash 'flymake-css 'flymake-easy 'flymake-go 'flymake 'flymake-json 'flymake-easy 'flymake-less 'less-css-mode 'flymake-ruby 'flymake-easy 'flymake-rust 'flymake-easy 'flymake-sass 'flymake-easy 'go-autocomplete 'auto-complete 'popup 'go-direx 'direx 'go-mode 'golint 'helm-cmd-t 'helm-css-scss 'helm 'async 'helm-flycheck 'helm 'async 'flycheck 'let-alist 'pkg-info 'epl 'dash 'dash 'helm-flymake 'helm 'async 'helm-rb 'helm-ag-r 'helm 'async 'helm 'async 'highlight-current-line 'inf-ruby 'json-mode 'json-snatcher 'json-reformat 'json-reformat 'json-snatcher 'less-css-mode 'let-alist 'magit 'git-rebase-mode 'git-commit-mode 'markdown-mode 'monokai-theme 'nodejs-repl 'nyan-mode 'org-ac 'yaxception 'log4e 'auto-complete-pcmp 'yaxception 'log4e 'auto-complete 'popup 'org-agenda-property 'org-autolist 'org-blog 'org-bullets 'org-caldav 'org 'org-cliplink 'org-context 'pkg-info 'epl 'popup 'powerline-evil 'powerline 'evil 'goto-chg 'undo-tree 'qml-mode 'ruby-additional 'rust-mode 'skewer-mode 'js2-mode 'simple-httpd 'smart-mode-line 'rich-minority 'dash 'sokoban 'tron-theme 'undo-tree 'visual-regexp 'yasnippet 'yaxception))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; (custom-set-variables
+;;  ;; custom-set-variables was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(custom-safe-themes
+;;    (quote
+;;     ("6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default))))
+
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  )
