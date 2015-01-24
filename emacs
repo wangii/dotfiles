@@ -129,17 +129,50 @@
 ;;   (split-window-horizontally)
 ;;   (buffer-menu))
 
-(evil-ex-define-cmd "bs" 'lw/popup-select-buffer)
+;; (evil-ex-define-cmd "bs" 'lw/popup-select-buffer)
 
 (defun my-insert-time-stamp()
     (interactive)
     (insert (current-time-string)))
 (evil-ex-define-cmd "ts" 'my-insert-time-stamp)
-    
+
+(require 'popup)
+;; binding ESC
+(define-key popup-isearch-keymap [escape] 'popup-isearch-cancel)
+
+;; TODO: Add Tab to select and cycle item
+;; ;; Add tab to select or cycle
+;; (defun lw/popup-select-or-next(popup)
+;;     (message "got tab")
+;;   (let ( (l (length (popup-list popup))) )
+;;     (if (> l 1)
+;;         (popup-next popup)
+;;       (popup-select 0)
+;;     )
+;;   )
+;; )
+
+;; (define-key popup-menu-keymap (kbd "TAB") 'lw/popup-select-or-next)
+
 ;; cmd-t
 (require 'helm-cmd-t)
-(global-set-key (kbd "M-t") 'helm-cmd-t)
+;; (global-set-key (kbd "M-t") 'helm-cmd-t)
 
+(defun lw/popup-select-file()
+  (interactive)
+  (let ((root-dir (cdr (helm-cmd-t-root-data ))))
+    (if root-dir
+        (let ((cmd (format "cd %s && git ls-files" root-dir)))
+          (let ((fs (split-string (shell-command-to-string cmd) "\n")))
+            (find-file (popup-menu* fs :isearch t)))
+          )
+      (message "Not a git directory!")
+    )
+  )
+)
+
+(global-set-key (kbd "M-t") 'lw/popup-select-file)
+    
 (defun lw/popup-select-buffer()
   (interactive)
     (let ((bn (popup-menu* (mapcar 'buffer-name (buffer-list)) :isearch t)))
