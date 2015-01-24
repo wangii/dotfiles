@@ -121,66 +121,116 @@
 (evil-mode 1)
 (global-evil-visualstar-mode t)
 
+;; https://bitbucket.org/lyro/evil/issue/360/possible-evil-search-symbol-forward
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (setq evil-symbol-word-search t)
+          )
+)
+
 ;; the missing gp
 (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
-
-;; (defun my-list-buffers()
-;;   (interactive)
-;;   (split-window-horizontally)
-;;   (buffer-menu))
-
-;; (evil-ex-define-cmd "bs" 'lw/popup-select-buffer)
 
 (defun my-insert-time-stamp()
     (interactive)
     (insert (current-time-string)))
 (evil-ex-define-cmd "ts" 'my-insert-time-stamp)
 
-(require 'popup)
-;; binding ESC
-(define-key popup-isearch-keymap [escape] 'popup-isearch-cancel)
 
-;; TODO: Add Tab to select and cycle item
-;; ;; Add tab to select or cycle
-;; (defun lw/popup-select-or-next(popup)
-;;     (message "got tab")
-;;   (let ( (l (length (popup-list popup))) )
-;;     (if (> l 1)
-;;         (popup-next popup)
-;;       (popup-select 0)
+;;===========================================================================
+;; Using popup menu to fast switch buffer and file
+;;===========================================================================
+
+(require 'popup)
+
+;; binding ESC
+
+;; ;; ;; Add tab to select or cycle
+;; (defun lw/popup-select-or-next(e default popup)
+;;     ;; (message (format "got key, type: %s" (type-of (elt e 0))))
+;;     (if (eq 'tab (elt e 0))
+;;     ;; (if (eq e '<tab>)
+;;         (let ( (l (length (popup-list popup))) )
+;;           (if (> l 1)
+;;               (popup-next popup)
+;;               (cl-return (car (popup-list popup)))
+;;               ;; (progn
+;;               ;;  (popup-select popup 0)
+;;               ;;  (message (format "kb: %s" (key-binding "\r")))
+;;               ;;  (call-interactively (key-binding "\r")))
+;;           )
+;;         )
 ;;     )
-;;   )
 ;; )
 
 ;; (define-key popup-menu-keymap (kbd "TAB") 'lw/popup-select-or-next)
+
+;; Not working yet :)
+;; (defvar lw/popup-isearch-keymap popup-isearch-keymap)
+
+;; (define-key lw/popup-isearch-keymap [escape] 'popup-isearch-cancel)
+
+;; (require 'cl)
+;; (cl-defun lw/popup-menu* (list)
+;;   (let* ((ret nil)
+;;          (menu (popup-menu* list :nowait t))
+;;          ;; fallback: using tab to select or cycle
+;;          )
+                      
+;;     (progn
+;;       (setq ret (popup-menu-event-loop menu
+;;                         popup-menu-keymap
+;;                         (lambda (e default)
+;;                           (if (eq 'tab (elt e 0))
+;;                             (let ( (l (length (popup-list menu))))
+;;                               (if (> l 1)
+;;                                   (popup-next menu)
+;;                                   (cl-return (car (popup-list menu)))
+;;                                )
+;;                              )
+;;                            )
+;;                         )
+;;                       :isearch t 
+;;                       :isearch-keymap lw/popup-isearch-keymap))
+;;       (popup-delete menu))
+;;     ret))
+
+(define-key popup-isearch-keymap [escape] 'popup-isearch-cancel)
 
 ;; cmd-t
 (require 'helm-cmd-t)
 ;; (global-set-key (kbd "M-t") 'helm-cmd-t)
 
-(defun lw/popup-select-file()
+(defun lw/popup-switch-file()
   (interactive)
-  (let ((root-dir (cdr (helm-cmd-t-root-data ))))
+  (let ((root-dir (cdr (helm-cmd-t-root-data))))
     (if root-dir
-        (let ((cmd (format "cd %s && git ls-files" root-dir)))
-          (let ((fs (split-string (shell-command-to-string cmd) "\n")))
-            (find-file (popup-menu* fs :isearch t)))
-          )
-      (message "Not a git directory!")
+        (let* (
+               (cmd (format "cd %s && git ls-files" root-dir))
+               (fs (split-string (shell-command-to-string cmd) "\n"))
+              )
+            (find-file (format "%s/%s" root-dir (popup-menu* fs :isearch t)))
+        )
+        (message "Not a git directory!")
     )
   )
 )
 
-(global-set-key (kbd "M-t") 'lw/popup-select-file)
+(global-set-key (kbd "M-t") 'lw/popup-switch-file)
     
-(defun lw/popup-select-buffer()
+(defun lw/popup-switch-buffer()
   (interactive)
-    (let ((bn (popup-menu* (mapcar 'buffer-name (buffer-list)) :isearch t)))
-      (switch-to-buffer (get-buffer bn))
-      )
-    )
-(global-set-key (kbd "M-p") 'lw/popup-select-buffer)
+  (let (
+        (bn (popup-menu* (mapcar 'buffer-name (buffer-list)) :isearch t))
+       )
+   (switch-to-buffer (get-buffer bn))
+  )
+)
 
+(global-set-key (kbd "M-p") 'lw/popup-switch-buffer)
+
+;;===========================================================================
+;;===========================================================================
 (defun my-list-files()
   (interactive)
   (when (buffer-file-name)
