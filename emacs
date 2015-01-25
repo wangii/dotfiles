@@ -204,6 +204,14 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;; the missing gp
 (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
 
+;; surround
+(require 'evil-surround)
+(global-evil-surround-mode 1)
+
+;; visual mark
+(require 'evil-visual-mark-mode)
+(evil-visual-mark-mode t)
+
 ;;==================================================
 ;; auto-complete, yas
 ;;==================================================
@@ -225,12 +233,17 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 Assumes that the frame is only split into two."
   (interactive)
   (unless (= (length (window-list)) 2) (error "Can only toggle a frame split in two"))
-  (let ((split-vertically-p (window-combined-p)))
-    (delete-window) ; closes current window
-    (if split-vertically-p
-        (split-window-horizontally)
-      (split-window-vertically)) ; gives us a split with the other window twice
-    (switch-to-buffer nil))) ; restore the original window in this part of the frame
+  (let (
+        (split-vertically-p (window-combined-p))
+       )
+       (delete-window) ; closes current window
+       (if split-vertically-p
+           (split-window-horizontally)
+           (split-window-vertically)
+       ) ; gives us a split with the other window twice
+       (switch-to-buffer nil)
+  )
+) ; restore the original window in this part of the frame
 
 ;; I don't use the default binding of 'C-x 5', so use toggle-frame-split instead
 (global-set-key (kbd "M-g") 'toggle-frame-split)
@@ -336,16 +349,18 @@ Assumes that the frame is only split into two."
 
 (defun lw/popup-switch-file()
   (interactive)
-  (let ((root-dir (cdr (helm-cmd-t-root-data))))
-    (if root-dir
-        (let* (
-               (cmd (format "cd %s && git ls-files" root-dir))
-               (fs (split-string (shell-command-to-string cmd) "\n"))
-              )
-            (find-file (format "%s/%s" root-dir (popup-menu* fs :isearch t)))
-        )
-        (message "Not a git directory!")
-    )
+  (let (
+        (root-dir (cdr (helm-cmd-t-root-data)))
+       )
+       (if root-dir
+           (let* (
+                  (cmd (format "cd %s && git ls-files" root-dir))
+                  (fs (split-string (shell-command-to-string cmd) "\n"))
+                 )
+                 (find-file (format "%s/%s" root-dir (popup-menu* fs :isearch t)))
+           )
+           (message "Not a git directory!")
+       )
   )
 )
 
@@ -356,7 +371,7 @@ Assumes that the frame is only split into two."
   (let (
         (bn (popup-menu* (mapcar 'buffer-name (buffer-list)) :isearch t))
        )
-   (switch-to-buffer (get-buffer bn))
+       (switch-to-buffer (get-buffer bn))
   )
 )
 
@@ -366,8 +381,9 @@ Assumes that the frame is only split into two."
 (defun lw/list-files()
   (interactive)
   (when (buffer-file-name)
-    (split-window-horizontally)
-    (dired (file-name-directory (buffer-file-name))))
+        (split-window-horizontally)
+        (dired (file-name-directory (buffer-file-name)))
+  )
 )
 
 (evil-ex-define-cmd "fs" 'lw/list-files)
