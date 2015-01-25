@@ -1,7 +1,11 @@
+;;; package
+
+;;; Code:
 ;;===========================================================================
 ;; packages
 ;;===========================================================================
 (require 'package)
+
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/"))
 
@@ -9,7 +13,7 @@
              '("marmalade" . "http://marmalade-repo.org/packages/"))
 
 
-;;(setq pkgs '(dash-at-point dash-at-point helm async helm auto-complete popup auto-complete flycheck let-alist pkg-info epl dash flycheck ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode bliss-theme evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-tutor evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash flymake-css flymake-easy flymake-go flymake flymake-json flymake-easy flymake-less less-css-mode flymake-ruby flymake-easy flymake-rust flymake-easy flymake-sass flymake-easy go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-flymake helm async helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp yasnippet yaxception))
+;;(setq pkgs '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode bliss-theme dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-surround evil-tutor evil goto-chg undo-tree evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp yasnippet yaxception))
 
 ;; ;; http://stackoverflow.com/questions/10092322/how-to-automatically-install-emacs-packages-by-specifying-a-list-of-package-name
 
@@ -133,6 +137,10 @@
 ;;==================================================
 ;; Coding related;
 ;;==================================================
+;; flycheck
+;;==================================================
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
 ;; paren
 (show-paren-mode 1)
 (electric-pair-mode 1)
@@ -211,6 +219,8 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;; visual mark
 (require 'evil-visual-mark-mode)
 (evil-visual-mark-mode t)
+
+(set-face-background 'evil-visual-mark-face "deep pink")
 
 ;;==================================================
 ;; auto-complete, yas
@@ -377,7 +387,7 @@ Assumes that the frame is only split into two."
 
 (global-set-key (kbd "M-p") 'lw/popup-switch-buffer)
 
-;;
+;; list-files
 (defun lw/list-files()
   (interactive)
   (when (buffer-file-name)
@@ -388,7 +398,18 @@ Assumes that the frame is only split into two."
 
 (evil-ex-define-cmd "fs" 'lw/list-files)
     
+;; timestamp
 (defun lw/insert-time-stamp()
     (interactive)
     (insert (current-time-string)))
 (evil-ex-define-cmd "ts" 'my-insert-time-stamp)
+
+;; list-buffer
+(defun lw/list-buffers()
+  (interactive)
+  (split-window-horizontally)
+  (buffer-menu))
+
+(evil-ex-define-cmd "bs" 'lw/list-buffers)
+;; (provide '.emacs)
+;;; .emacs ends here
