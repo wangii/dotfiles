@@ -1,5 +1,5 @@
-;;; package
-
+;;; package -- Summary
+;;; Commentary:
 ;;; Code:
 ;;===========================================================================
 ;; packages
@@ -11,7 +11,6 @@
 
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/"))
-
 
 ;;(setq pkgs '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode bliss-theme dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-surround evil-tutor evil goto-chg undo-tree evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp yasnippet yaxception))
 
@@ -35,7 +34,7 @@
 
 ;; (ensure-packages-installed pkgs) ;  --> (nil nil) if iedit and magit are already installed
 
-(package-initialize)           
+(package-initialize)
 
 ;; Installed packages;
 
@@ -64,11 +63,17 @@
 ;;===========================================================================
 ;; general
 ;;===========================================================================
+
+;; Linux
+(if (eq 'gnu/linux system-type)
+    (setq x-meta-keysym 'super
+          x-super-keysym 'meta))
 ;; mac
-(setq mac-option-key-is-meta nil
-    mac-command-key-is-meta t
-    mac-command-modifier 'meta
-    mac-option-modifier 'none)
+(if (eq 'darwin system-type)
+    (setq mac-option-key-is-meta nil
+          mac-command-key-is-meta t
+          mac-command-modifier 'meta
+          mac-option-modifier 'none))
 
 ;; no backup
 (setq make-backup-files nil) ; stop creating backup~ files
@@ -79,6 +84,22 @@
 (ido-mode 1)
 (setq ido-separator "\n")
 (setq ido-enable-flex-matching t)
+
+;;===========================================================================
+;; window ops
+;;===========================================================================
+
+(global-set-key (kbd "M-o") 'other-window)
+(global-set-key (kbd "M-0") 'delete-window)
+(global-set-key (kbd "M-1") 'delete-other-windows)
+(global-set-key (kbd "M-2") 'split-window-below)
+(global-set-key (kbd "M-3") 'split-window-right)
+
+(global-unset-key (kbd "C-x o"))
+(global-unset-key (kbd "C-x 0"))
+(global-unset-key (kbd "C-x 1"))
+(global-unset-key (kbd "C-x 2"))
+(global-unset-key (kbd "C-x 3"))
 
 ;;===========================================================================
 ;; UI
@@ -218,15 +239,18 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 ;; visual mark
 (require 'evil-visual-mark-mode)
-(evil-visual-mark-mode t)
 
 (set-face-background 'evil-visual-mark-face "deep pink")
+(setq evil-visual-mark-exclude-marks '(?^ ?\[ ?\]))
+
+(evil-visual-mark-mode t)
 
 ;;==================================================
 ;; auto-complete, yas
 ;;==================================================
 (require 'auto-complete)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/dict")
+
 (require 'auto-complete-config)
 (ac-config-default)
 
@@ -299,8 +323,6 @@ Assumes that the frame is only split into two."
 
 (require 'popup)
 
-;; binding ESC
-
 ;; ;; ;; Add tab to select or cycle
 ;; (defun lw/popup-select-or-next(e default popup)
 ;;     ;; (message (format "got key, type: %s" (type-of (elt e 0))))
@@ -330,24 +352,23 @@ Assumes that the frame is only split into two."
 ;; (cl-defun lw/popup-menu* (list)
 ;;   (let* ((ret nil)
 ;;          (menu (popup-menu* list :nowait t))
-;;          ;; fallback: using tab to select or cycle
-;;          )
-                      
+;;         )
+;;                     
 ;;     (progn
 ;;       (setq ret (popup-menu-event-loop menu
-;;                         popup-menu-keymap
-;;                         (lambda (e default)
-;;                           (if (eq 'tab (elt e 0))
-;;                             (let ( (l (length (popup-list menu))))
-;;                               (if (> l 1)
-;;                                   (popup-next menu)
-;;                                   (cl-return (car (popup-list menu)))
-;;                                )
-;;                              )
-;;                            )
-;;                         )
-;;                       :isearch t 
-;;                       :isearch-keymap lw/popup-isearch-keymap))
+;;                                        popup-menu-keymap
+;;                                        (lambda (e default)
+;;                                          (if (eq 'tab (elt e 0))
+;;                                            (let ( (l (length (popup-list menu))))
+;;                                              (if (> l 1)
+;;                                                  (popup-next menu)
+;;                                                  (cl-return (car (popup-list menu)))
+;;                                               )
+;;                                             )
+;;                                           )
+;;                                        )
+;;                                        :isearch t 
+;;                                        :isearch-keymap lw/popup-isearch-keymap))
 ;;       (popup-delete menu))
 ;;     ret))
 
@@ -385,7 +406,7 @@ Assumes that the frame is only split into two."
   )
 )
 
-(global-set-key (kbd "M-p") 'lw/popup-switch-buffer)
+(global-set-key (kbd "M-b") 'lw/popup-switch-buffer)
 
 ;; list-files
 (defun lw/list-files()
