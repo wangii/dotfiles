@@ -66,8 +66,11 @@
 
 ;; Linux
 (if (eq 'gnu/linux system-type)
-    (setq x-meta-keysym 'super
-          x-super-keysym 'meta))
+    (progn
+      (setq x-meta-keysym 'super
+            x-super-keysym 'meta)
+      (menu-bar-mode -1)
+      ))
 ;; mac
 (if (eq 'darwin system-type)
     (setq mac-option-key-is-meta nil
@@ -104,8 +107,8 @@
 (global-set-key (kbd "C->") 'evil-window-increase-width)
 (global-set-key (kbd "C-<") 'evil-window-decrease-width)
 
-(global-unset-key (kbd "C-w >"))
-(global-unset-key (kbd "C-w <"))
+;;(global-unset-key (kbd "C-w >"))
+;;(global-unset-key (kbd "C-w <"))
 
 ;;===========================================================================
 ;; UI
@@ -145,7 +148,7 @@
 ;;===========================================================================
 ;; font
 ;;===========================================================================
-;; (set-face-attribute 'default nil :font "Consolas-15")
+(set-face-attribute 'default nil :font "Consolas-15")
 ;; (set-face-attribute 'default nil :font "Anonymous Pro-15")
 ;; (set-face-attribute 'default nil :font "Inconsolata\-g-15")
 ;; (set-face-attribute 'default nil :font "Liberation Mono-15")
@@ -155,7 +158,7 @@
 ;; (set-face-attribute 'default nil :font "TheSansMono\-ExtraLight-15")
 ;; (set-face-attribute 'default nil :font "InputMono-15")
 ;; (set-face-attribute 'default nil :font "Akkurat\-Mono-15")
-(set-face-attribute 'default nil :font "Droid Sans Mono-15")
+;; (set-face-attribute 'default nil :font "Droid Sans Mono-15")
 ;; (set-face-attribute 'default nil :font "Ubuntu Mono-16")
 ;; (set-face-attribute 'default nil :font "BPMono-15")
 ;; (set-face-attribute 'default nil :font "Source Code Pro-15")
@@ -251,6 +254,60 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 (evil-visual-mark-mode t)
 
+;; (setq evil-visual-mark-yank-start -1)
+;; ;; (setq evil-visual-mark-yank-end -1)
+
+;; (make-local-variable 'evil-visual-mark-yank-start)
+;; ;; (make-local-variable 'evil-visual-mark-yank-end)
+
+;; (setq evil-visual-mark-yank-old-faces '())
+;; (make-local-variable 'evil-visual-mark-yand-old-faces)
+
+;; (defun lw/evil-visual-mark-handle-yank(char &optional pos advance)
+;;   (message "char: %s %s" char pos)
+;;   (if (= char ?\[)
+;;       (setq evil-visual-mark-yank-start pos))
+
+;;   (if (= char ?\])
+;;       (progn
+;;         ;; (setq evil-visual-mark-yank-end pos)
+;;         (if (and (> evil-visual-mark-yank-start 0)
+;;                  (> pos 0))
+
+;;             (let ((inhibit-modification-hooks t)
+;;                   (end (car evil-visual-mark-yank-old-faces)))
+
+;;              ;; restore old faces
+;;               (-each (cdr evil-visual-mark-yank-old-faces)
+;;                 (lambda (x)
+;;                   (message "x: %s" x)
+;;                   (put-text-property (car x) end 'face (cdr x))
+;;                   ))
+
+;;               ;; save current faces
+;;               (setq evil-visual-mark-yank-old-faces (list pos))
+;;               (let ((p evil-visual-mark-yank-start))
+;;                 (while (> pos p)
+;;                   (message "-p: %s" p)
+;;                   (message " f: %s" (list p (get-text-property p 'face)))
+;;                   (setq evil-visual-mark-yank-old-faces
+;;                         (append evil-visual-mark-yank-old-faces
+;;                          (list (list p (get-text-property p 'face)))))
+;;                   (setq p (next-property-change p (current-buffer) pos))
+;;                   (message "+p: %s" p)
+;;                   ))
+
+;;               ;; draw new faces
+;;               ;; draw new faces
+;;               ;; draw new faces
+
+;;               (message "change :%s %s" evil-visual-mark-yank-start pos)
+;;               (put-text-property evil-visual-mark-yank-start pos 'face 'evil-visual-mark-face)
+;;               )
+;;         )
+;;       )))
+
+;; ;; (advice-add 'evil-set-marker :after #'lw/evil-visual-mark-handle-yank)
 ;;==================================================
 ;; auto-complete, yas
 ;;==================================================
@@ -288,6 +345,12 @@ Assumes that the frame is only split into two."
 ;; I don't use the default binding of 'C-x 5', so use toggle-frame-split instead
 (global-set-key (kbd "M-g") 'toggle-frame-split)
 
+
+;;===========================================================================
+;; magit
+;;===========================================================================
+(global-set-key (kbd "M-m") 'magit-status)
+
 ;;===========================================================================
 ;; language specifics
 ;;===========================================================================
@@ -297,13 +360,16 @@ Assumes that the frame is only split into two."
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
             (setq evil-symbol-word-search t)
+            (local-set-key (kbd "M-e") 'eval-region)
           )
 )
 
 ;;===========================================================================
 ;; js2
 ;;===========================================================================
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(autoload 'js3-mode "js3" nil t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js3-mode))
 
 ;;===========================================================================
 ;; node repl
