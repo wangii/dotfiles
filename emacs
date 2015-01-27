@@ -101,6 +101,12 @@
 (global-unset-key (kbd "C-x 2"))
 (global-unset-key (kbd "C-x 3"))
 
+(global-set-key (kbd "C->") 'evil-window-increase-width)
+(global-set-key (kbd "C-<") 'evil-window-decrease-width)
+
+(global-unset-key (kbd "C-w >"))
+(global-unset-key (kbd "C-w <"))
+
 ;;===========================================================================
 ;; UI
 ;;===========================================================================
