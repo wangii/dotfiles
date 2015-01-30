@@ -63,6 +63,8 @@
 ;;===========================================================================
 ;; general
 ;;===========================================================================
+;; turn off bell
+(setq ring-bell-function 'ignore)
 
 ;; Linux
 (if (eq 'gnu/linux system-type)
@@ -148,7 +150,7 @@
 ;;===========================================================================
 ;; font
 ;;===========================================================================
-(set-face-attribute 'default nil :font "Consolas-15")
+(set-face-attribute 'default nil :font "Consolas-16")
 ;; (set-face-attribute 'default nil :font "Anonymous Pro-15")
 ;; (set-face-attribute 'default nil :font "Inconsolata\-g-15")
 ;; (set-face-attribute 'default nil :font "Liberation Mono-15")
@@ -250,64 +252,69 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (require 'evil-visual-mark-mode)
 
 (set-face-background 'evil-visual-mark-face "deep pink")
-(setq evil-visual-mark-exclude-marks '(?^ ?\[ ?\]))
+;; (setq evil-visual-mark-exclude-marks '(?^ ?[ ?]))
 
 (evil-visual-mark-mode t)
 
 ;; (setq evil-visual-mark-yank-start -1)
-;; ;; (setq evil-visual-mark-yank-end -1)
+;; (setq evil-visual-mark-yank-end -1)
 
 ;; (make-local-variable 'evil-visual-mark-yank-start)
-;; ;; (make-local-variable 'evil-visual-mark-yank-end)
+;; (make-local-variable 'evil-visual-mark-yank-end)
 
-;; (setq evil-visual-mark-yank-old-faces '())
-;; (make-local-variable 'evil-visual-mark-yand-old-faces)
+;; (setq evil-visual-mark-yank-original-faces '())
+;; (make-local-variable 'evil-visual-mark-yank-original-faces)
 
 ;; (defun lw/evil-visual-mark-handle-yank(char &optional pos advance)
-;;   (message "char: %s %s" char pos)
+;;   (message "set marker: %s %s" char pos)
 ;;   (if (= char ?\[)
 ;;       (setq evil-visual-mark-yank-start pos))
 
 ;;   (if (= char ?\])
-;;       (progn
-;;         ;; (setq evil-visual-mark-yank-end pos)
-;;         (if (and (> evil-visual-mark-yank-start 0)
-;;                  (> pos 0))
+;;       (setq evil-visual-mark-yank-end pos)))
 
-;;             (let ((inhibit-modification-hooks t)
-;;                   (end (car evil-visual-mark-yank-old-faces)))
+;; (defun lw/evil-visual-mark-yank-restore()
+;;   (if evil-visual-mark-yank-original-faces
+;;       (let ((inhibit-modification-hooks t)
+;;             (end (car evil-visual-mark-yank-original-faces))
+;;             (rest (cdr evil-visual-mark-yank-original-faces)))
+;;         (-each rest
+;;           (lambda (x)
+;;             (put-text-property (car x) end 'face (cdr x)))))))
 
-;;              ;; restore old faces
-;;               (-each (cdr evil-visual-mark-yank-old-faces)
-;;                 (lambda (x)
-;;                   (message "x: %s" x)
-;;                   (put-text-property (car x) end 'face (cdr x))
-;;                   ))
+;; (defun lw/evil-visual-mark-yank-render()
+;;   (message "render from %s to %s" evil-visual-mark-yank-start evil-visual-mark-yank-end)
 
-;;               ;; save current faces
-;;               (setq evil-visual-mark-yank-old-faces (list pos))
-;;               (let ((p evil-visual-mark-yank-start))
-;;                 (while (> pos p)
-;;                   (message "-p: %s" p)
-;;                   (message " f: %s" (list p (get-text-property p 'face)))
-;;                   (setq evil-visual-mark-yank-old-faces
-;;                         (append evil-visual-mark-yank-old-faces
-;;                          (list (list p (get-text-property p 'face)))))
-;;                   (setq p (next-property-change p (current-buffer) pos))
-;;                   (message "+p: %s" p)
-;;                   ))
+;;   (if (and
+;;        (> evil-visual-mark-yank-start 0)
+;;        (> evil-visual-mark-yank-end 0)
+;;        (> evil-visual-mark-yank-end evil-visual-mark-yank-start)
+;;        )
+;;       (let ((start evil-visual-mark-yank-start)
+;;             (end evil-visual-mark-yank-end)
+;;             (faces '()))
+;;         (progn
+;;           ;; store old faces
+;;           (setq faces (list end))
+;;           (let ((pos start))
+;;             (while (> end pos)
+;;               (setq faces
+;;                     (append faces (list
+;;                                    (list pos (get-text-property pos 'face)))))
+;;               (setq pos (next-property-change pos (current-buffer) end))))
 
-;;               ;; draw new faces
-;;               ;; draw new faces
-;;               ;; draw new faces
-
-;;               (message "change :%s %s" evil-visual-mark-yank-start pos)
-;;               (put-text-property evil-visual-mark-yank-start pos 'face 'evil-visual-mark-face)
-;;               )
-;;         )
-;;       )))
+;;           ;; apply new face
+;;           (let ((inhibit-modification-hooks t))
+            
+;;             (put-text-property start end 'face 'evil-visual-mark-face)
+;;             )
+;;           (setq evil-visual-mark-yank-original-faces faces)))))
 
 ;; ;; (advice-add 'evil-set-marker :after #'lw/evil-visual-mark-handle-yank)
+;; ;; (add-hook 'evil-normal-state-exit-hook 'lw/evil-visual-mark-yank-restore)
+;; ;; (add-hook 'evil-normal-state-entry-hook 'lw/evil-visual-mark-yank-render)
+;; ;; (remove-hook 'evil-normal-state-exit-hook 'lw/evil-visual-mark-yank-restore)
+;; ;; (remove-hook 'evil-normal-state-entry-hook 'lw/evil-visual-mark-yank-render)
 ;;==================================================
 ;; auto-complete, yas
 ;;==================================================
@@ -339,8 +346,8 @@ Assumes that the frame is only split into two."
            (split-window-vertically)
        ) ; gives us a split with the other window twice
        (switch-to-buffer nil)
-  )
-) ; restore the original window in this part of the frame
+  ))
+ ; restore the original window in this part of the frame
 
 ;; I don't use the default binding of 'C-x 5', so use toggle-frame-split instead
 (global-set-key (kbd "M-g") 'toggle-frame-split)
@@ -367,9 +374,13 @@ Assumes that the frame is only split into two."
 ;;===========================================================================
 ;; js2
 ;;===========================================================================
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (autoload 'js3-mode "js3" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js3-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
+
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . jsx-mode))
+(autoload 'jsx-mode "jsx-mode" "JSX mode" t)
+(require 'react-snippets)
 
 ;;===========================================================================
 ;; node repl
@@ -434,12 +445,12 @@ Assumes that the frame is only split into two."
 ;;                                            (let ( (l (length (popup-list menu))))
 ;;                                              (if (> l 1)
 ;;                                                  (popup-next menu)
-;;                                                  (cl-return (car (popup-list menu)))
+;;                                                  (cl-return (car (popup-list isearch)))
 ;;                                               )
 ;;                                             )
 ;;                                           )
 ;;                                        )
-;;                                        :isearch t 
+;;                                        :menu t 
 ;;                                        :isearch-keymap lw/popup-isearch-keymap))
 ;;       (popup-delete menu))
 ;;     ret))
