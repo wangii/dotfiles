@@ -12,7 +12,8 @@
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/"))
 
-;;(setq pkgs '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode bliss-theme dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-surround evil-tutor evil goto-chg undo-tree evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp yasnippet yaxception))
+;;(setq pkgs '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode bliss-theme dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-surround evil-tutor evil goto-chg undo-tree evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby js3-mode json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode react-snippets yasnippet ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp web-mode yasnippet yaxception)
+)
 
 ;; ;; http://stackoverflow.com/questions/10092322/how-to-automatically-install-emacs-packages-by-specifying-a-list-of-package-name
 
@@ -150,7 +151,12 @@
 ;;===========================================================================
 ;; font
 ;;===========================================================================
-(set-face-attribute 'default nil :font "Consolas-16")
+(if (eq 'gnu/linux system-type)
+    (set-face-attribute 'default nil :font "Consolas-16"))
+
+(if (eq 'darwin system-type)
+    (set-face-attribute 'default nil :font "Droid Sans Mono-15"))
+
 ;; (set-face-attribute 'default nil :font "Anonymous Pro-15")
 ;; (set-face-attribute 'default nil :font "Inconsolata\-g-15")
 ;; (set-face-attribute 'default nil :font "Liberation Mono-15")
@@ -160,7 +166,6 @@
 ;; (set-face-attribute 'default nil :font "TheSansMono\-ExtraLight-15")
 ;; (set-face-attribute 'default nil :font "InputMono-15")
 ;; (set-face-attribute 'default nil :font "Akkurat\-Mono-15")
-;; (set-face-attribute 'default nil :font "Droid Sans Mono-15")
 ;; (set-face-attribute 'default nil :font "Ubuntu Mono-16")
 ;; (set-face-attribute 'default nil :font "BPMono-15")
 ;; (set-face-attribute 'default nil :font "Source Code Pro-15")
@@ -378,8 +383,13 @@ Assumes that the frame is only split into two."
 (autoload 'js3-mode "js3" nil t)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
 
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . jsx-mode))
-(autoload 'jsx-mode "jsx-mode" "JSX mode" t)
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+(defadvice web-mode-highlight-part (around tweak-jsx activate)
+  (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+    ad-do-it))
+
 (require 'react-snippets)
 
 ;;===========================================================================
