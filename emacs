@@ -96,7 +96,13 @@
 ;;===========================================================================
 
 (global-set-key (kbd "M-o") 'other-window)
-(global-set-key (kbd "M-0") 'delete-window)
+
+(if (eq 'gnu/linux system-type)
+    (global-set-key (kbd "M-9") 'delete-window))
+
+(if (eq 'darwin system-type)
+    (global-set-key (kbd "M-0") 'delete-window))
+
 (global-set-key (kbd "M-1") 'delete-other-windows)
 (global-set-key (kbd "M-2") 'split-window-below)
 (global-set-key (kbd "M-3") 'split-window-right)
@@ -174,6 +180,8 @@
 ;;==================================================
 ;; Coding related;
 ;;==================================================
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 ;; flycheck
 ;;==================================================
 (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -310,7 +318,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 ;;           ;; apply new face
 ;;           (let ((inhibit-modification-hooks t))
-            
+
 ;;             (put-text-property start end 'face 'evil-visual-mark-face)
 ;;             )
 ;;           (setq evil-visual-mark-yank-original-faces faces)))))
@@ -329,7 +337,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (require 'auto-complete-config)
 (ac-config-default)
 
-;; auto-complete html   
+;; auto-complete html
 (add-hook 'html-mode-hook 'ac-html-enable)
 
 ;; yasnippet
@@ -446,7 +454,7 @@ Assumes that the frame is only split into two."
 ;;   (let* ((ret nil)
 ;;          (menu (popup-menu* list :nowait t))
 ;;         )
-;;                     
+;;
 ;;     (progn
 ;;       (setq ret (popup-menu-event-loop menu
 ;;                                        popup-menu-keymap
@@ -460,7 +468,7 @@ Assumes that the frame is only split into two."
 ;;                                             )
 ;;                                           )
 ;;                                        )
-;;                                        :menu t 
+;;                                        :menu t
 ;;                                        :isearch-keymap lw/popup-isearch-keymap))
 ;;       (popup-delete menu))
 ;;     ret))
@@ -489,7 +497,7 @@ Assumes that the frame is only split into two."
 )
 
 (global-set-key (kbd "M-t") 'lw/popup-switch-file)
-    
+
 (defun lw/popup-switch-buffer()
   (interactive)
   (let (
@@ -511,7 +519,7 @@ Assumes that the frame is only split into two."
 )
 
 (evil-ex-define-cmd "fs" 'lw/list-files)
-    
+
 ;; timestamp
 (defun lw/insert-time-stamp()
     (interactive)
