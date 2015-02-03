@@ -19,7 +19,7 @@
 ;; (setq url-http-attempt-keepalives nil)
 
 ;; (defvar prelude-packages
-;;   '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode bliss-theme dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-surround evil-tutor evil goto-chg undo-tree evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-direx direx go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby js3-mode json-mode json-snatcher json-reformat json-reformat json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode react-snippets yasnippet ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp web-mode yasnippet yaxception)
+;; '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode auto-complete-auctex auto-complete popup yasnippet auto-complete-c-headers auto-complete popup auto-complete-chunk auto-complete popup auto-complete-clang auto-complete popup dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-paredit paredit evil goto-chg undo-tree evil-surround evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash highlight-current-line json-mode json-snatcher json-reformat json-reformat json-rpc json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode monokai-theme nodejs-repl org org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup paredit pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree react-snippets yasnippet skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash undo-tree visual-regexp web-mode yasnippet yaxception)
 ;;   "A list of packages to ensure are installed at launch.")
 ;;
 ;; (defun prelude-packages-installed-p ()
@@ -62,6 +62,9 @@
 ;;===========================================================================
 ;; general
 ;;===========================================================================
+;; performance
+(setq gc-cons-threshold 50000000)
+
 ;; turn off bell
 (setq ring-bell-function 'ignore)
 
@@ -383,18 +386,62 @@ Assumes that the frame is only split into two."
 )
 
 ;;===========================================================================
-;; js2
+;; js
 ;;===========================================================================
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(autoload 'js3-mode "js3" nil t)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-mode))
 
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-(defadvice web-mode-highlight-part (around tweak-jsx activate)
-  (if (equal web-mode-content-type "jsx")
-      (let ((web-mode-enable-part-face nil))
-        ad-do-it)
-    ad-do-it))
+;; (add-hook 'js2-mode-hook 'ac-js2-mode)
+
+(require 'flycheck)
+(flycheck-define-checker jsxhint-checker
+  "A JSX syntax and style checker based on JSXHint."
+
+  :command ("jsxhint" source)
+  :error-patterns
+  ((error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end))
+  :modes (js2-mode))
+
+(add-hook 'js2-mode-hook (lambda ()
+                           (if (string-match "\\.jsx$" (buffer-name (current-buffer)))
+                               (progn
+                                 (ac-js2-mode)
+                                 (flycheck-select-checker 'jsxhint-checker)
+                                 (flycheck-mode)
+                                 (auto-complete-mode 1)))))
+
+;;===========================================================================
+;; jsx
+;; http://truongtx.me/2014/03/10/emacs-setup-jsx-mode-and-jsx-syntax-checking/
+;;===========================================================================
+;; (require 'jsx-mode)
+;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . jsx-mode))
+
+;; (setq jsx-indent-level 2)
+
+;; (require 'flycheck)
+;; (flycheck-define-checker jsxhint-checker
+;;   "A JSX syntax and style checker based on JSXHint."
+
+;;   :command ("jsxhint" source)
+;;   :error-patterns
+;;   ((error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end))
+;;   :modes (jsx-mode))
+
+;; (add-hook 'jsx-mode-hook (lambda ()
+;;                           (flycheck-select-checker 'jsxhint-checker)
+;;                           (flycheck-mode)
+;;                           (auto-complete-mode 1)))
+
+;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+;; (defadvice web-mode-highlight-part (around tweak-jsx activate)
+;;   (if (equal web-mode-content-type "jsx")
+;;       (let ((web-mode-enable-part-face nil))
+;;         ad-do-it)
+;;     ad-do-it))
+;; (add-hook 'web-mode-hook
+;;           (lambda()
+;;             (define-key (current-local-map) (kbd "M-/") 'web-mode-comment-or-uncomment)))
 
 (require 'react-snippets)
 
