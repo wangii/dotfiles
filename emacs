@@ -402,13 +402,26 @@ Assumes that the frame is only split into two."
   ((error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end))
   :modes (js2-mode))
 
+;; (defun lw-narrow(start end)
+;;   (web-mode))
+
 (add-hook 'js2-mode-hook (lambda ()
                            (if (string-match "\\.jsx$" (buffer-name (current-buffer)))
                                (progn
                                  (ac-js2-mode)
                                  (flycheck-select-checker 'jsxhint-checker)
                                  (flycheck-mode)
-                                 (auto-complete-mode 1)))))
+                                 (auto-complete-mode 1)
+
+                                 ;; region narrow/widen
+                                 ;; (advice-add 'narrow-to-region :after #'lw-narrow)
+                                 )
+                             )
+                           )
+          )
+
+;; (add-hook 'web-mode-hook (lambda()
+;;                            (advice-add 'widen :after #'js2-mode)))
 
 ;;===========================================================================
 ;; jsx
@@ -546,7 +559,7 @@ Assumes that the frame is only split into two."
 (defun lw/popup-switch-buffer()
   (interactive)
   (let (
-        (bn (popup-menu* (mapcar 'buffer-name (buffer-list)) :isearch t))
+        (bn (popup-menu* (mapcar 'buffer-name (remove (current-buffer) (buffer-list))) :isearch t))
        )
        (switch-to-buffer (get-buffer bn))
   )
@@ -580,3 +593,4 @@ Assumes that the frame is only split into two."
 (evil-ex-define-cmd "bs" 'lw/list-buffers)
 ;; (provide '.emacs)
 ;;; .emacs ends here
+(put 'narrow-to-region 'disabled nil)
