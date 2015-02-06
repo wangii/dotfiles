@@ -162,7 +162,7 @@
     (set-face-attribute 'default nil :font "Consolas-16"))
 
 (if (eq 'darwin system-type)
-    (set-face-attribute 'default nil :font "Droid Sans Mono-15"))
+    (set-face-attribute 'default nil :font "Droid Sans Mono-16"))
 
 ;; (set-face-attribute 'default nil :font "Anonymous Pro-15")
 ;; (set-face-attribute 'default nil :font "Inconsolata\-g-15")
@@ -175,7 +175,7 @@
 ;; (set-face-attribute 'default nil :font "Akkurat\-Mono-15")
 ;; (set-face-attribute 'default nil :font "Ubuntu Mono-16")
 ;; (set-face-attribute 'default nil :font "BPMono-15")
-;; (set-face-attribute 'default nil :font "Source Code Pro-15")
+;; (set-face-attribute 'default nil :font "Source Code Pro-16")
 ;; (set-face-attribute 'default nil :font "Aurulent Sans Mono-15")
 
 ;;==================================================
@@ -392,7 +392,7 @@ Assumes that the frame is only split into two."
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-mode))
 
 ;; (add-hook 'js2-mode-hook 'ac-js2-mode)
-
+;; http://truongtx.me/2014/03/10/emacs-setup-jsx-mode-and-jsx-syntax-checking/
 (require 'flycheck)
 (flycheck-define-checker jsxhint-checker
   "A JSX syntax and style checker based on JSXHint."
@@ -546,13 +546,13 @@ Assumes that the frame is only split into two."
            (let* (
                   (cmd (format "cd %s && git ls-files" root-dir))
                   (fs (split-string (shell-command-to-string cmd) "\n"))
-                 )
-                 (find-file (format "%s/%s" root-dir (popup-menu* fs :isearch t)))
-           )
-           (message "Not a git directory!")
-       )
-  )
-)
+                  (fn (format "%s/%s" root-dir (popup-menu* fs :isearch t)))
+                  ;; see if the file already opened in a buffer. avoid multiple buffers for one file.
+                  (bs (-select (lambda (x) (eq fn (buffer-file-name x))) (buffer-list)) ))
+             (if bs
+                 (switch-to-buffer (car bs))
+                 (find-file fn)))
+           (message "Not a git directory!"))))
 
 (global-set-key (kbd "M-t") 'lw/popup-switch-file)
 
