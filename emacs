@@ -22,25 +22,26 @@
 ;; install packages
 ;; http://stackoverflow.com/questions/10092322/how-to-automatically-install-emacs-packages-by-specifying-a-list-of-package-name
 ;; (setq url-http-attempt-keepalives nil)
+;; (require 'cl)
 
-;; (defvar prelude-packages
-;; '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode auto-compile packed auto-complete-auctex auto-complete popup yasnippet auto-complete-c-headers auto-complete popup auto-complete-chunk auto-complete popup auto-complete-clang auto-complete popup bliss-theme dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-paredit paredit evil goto-chg undo-tree evil-surround evil-tutor evil goto-chg undo-tree evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-direx direx go-mode golint goto-last-change helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby js3-mode json-mode json-snatcher json-reformat json-reformat json-rpc json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context packed paredit pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode react-snippets yasnippet ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp web-mode yasnippet yaxception)
-;;   "A list of packages to ensure are installed at launch.")
-;;
-;; (defun prelude-packages-installed-p ()
-;;   (loop for p in prelude-packages
-;;         when (not (package-installed-p p)) do (return nil)
-;;         finally (return t)))
-;;
-;; (unless (prelude-packages-installed-p)
-;;   ;; check for new packages (package versions)
-;;   (message "%s" "Emacs Prelude is now refreshing its package database...")
-;;   (package-refresh-contents)
-;;   (message "%s" " done.")
-;;   ;; install the missing packages
-;;   (dolist (p prelude-packages)
-;;     (when (not (package-installed-p p))
-;;       (package-install p))))
+;;  (defvar prelude-packages
+;;  '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-inf-ruby auto-complete popup inf-ruby ac-js2 skewer-mode js2-mode simple-httpd js2-mode ace-jump-buffer dash ace-jump-mode ace-window ace-jump-mode auto-compile packed auto-complete-auctex auto-complete popup yasnippet auto-complete-c-headers auto-complete popup auto-complete-chunk auto-complete popup auto-complete-clang auto-complete popup bliss-theme dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-paredit paredit evil goto-chg undo-tree evil-surround evil-tutor evil goto-chg undo-tree evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-direx direx go-mode golint goto-last-change helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash helm-rb helm-ag-r helm async helm async highlight-current-line inf-ruby js3-mode json-mode json-snatcher json-reformat json-reformat json-rpc json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl nyan-mode org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup org-agenda-property org-autolist org-blog org-bullets org-caldav org org-cliplink org-context packed paredit pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree qml-mode react-snippets yasnippet ruby-additional rust-mode skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash sokoban tron-theme undo-tree visual-regexp web-mode yasnippet yaxception)
+;;    "A list of packages to ensure are installed at launch.")
+
+;;  (defun prelude-packages-installed-p ()
+;;    (loop for p in prelude-packages
+;;          when (not (package-installed-p p)) do (return nil)
+;;          finally (return t)))
+
+;;  (unless (prelude-packages-installed-p)
+;;    ;; check for new packages (package versions)
+;;    (message "%s" "Emacs Prelude is now refreshing its package database...")
+;;    (package-refresh-contents)
+;;    (message "%s" " done.")
+;;    ;; install the missing packages
+;;    (dolist (p prelude-packages)
+;;      (when (not (package-installed-p p))
+;;        (package-install p))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -80,12 +81,18 @@
             x-super-keysym 'meta)
       (menu-bar-mode -1)
       ))
+
 ;; mac
 (if (eq 'darwin system-type)
     (setq mac-option-key-is-meta nil
           mac-command-key-is-meta t
           mac-command-modifier 'meta
           mac-option-modifier 'none))
+
+;; windows
+(if (eq 'windows-nt system-type)
+    (setq w32-lwindow-modifier 'meta
+          w32-rwindow-modifier 'meta))
 
 ;; no backup
 (setq make-backup-files nil) ; stop creating backup~ files
@@ -478,7 +485,9 @@ Assumes that the frame is only split into two."
 (server-mode)
 
 ;; (cd "~/Documents/work")
-(setq command-line-default-directory "~/Documents/work")
+(if (eq 'windows-nt system-type)
+    (setq command-line-default-directory "~/Documents/GitHub")
+    (setq command-line-default-directory "~/Documents/work"))
 
 ;;===========================================================================
 ;; My funcs
