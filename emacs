@@ -1,6 +1,11 @@
 ;;; package -- Summary
 ;;; Commentary:
 ;;; Code:
+
+;; (let ((benchmark-init.el "~/benchmark-init-el/benchmark-init.el"))
+;;     (when (file-exists-p benchmark-init.el)
+;; 	      (load benchmark-init.el)))
+
 ;;===========================================================================
 ;; packages
 ;;===========================================================================
@@ -534,14 +539,31 @@ Assumes that the frame is only split into two."
 (define-key popup-isearch-keymap [escape] 'popup-isearch-cancel)
 
 ;; cmd-t
-(require 'helm-cmd-t)
-;; (global-set-key (kbd "M-t") 'helm-cmd-t)
+;; (require 'helm-cmd-t)
+;;
+;; get the dir where .git resides in
+;; return nil if not found
+;;
+(defun lw/git-root (fn)
+  (let ((dir (file-name-directory fn))
+        (ret nil)
+        (found nil))
+
+    (while (not found)
+      (message dir)
+      (if (string= dir "/")
+          (setq found t)
+        (if (file-exists-p (concat dir ".git"))
+          (progn
+            (setq found t)
+            (setq ret (substring dir 0 -1)))
+
+        (setq dir (file-name-directory (substring dir 0 -1))))))
+    ret))
 
 (defun lw/popup-switch-file()
   (interactive)
-  (let (
-        (root-dir (cdr (helm-cmd-t-root-data)))
-       )
+  (let ((root-dir (lw/git-root (buffer-file-name (current-buffer)))))
        (if root-dir
            (let* (
                   (cmd (format "cd %s && git ls-files" root-dir))
