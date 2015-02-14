@@ -25,8 +25,7 @@
 ;; (require 'cl)
 
 ;;  (defvar prelude-packages
-;; '(ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-js2 skewer-mode js2-mode simple-httpd js2-mode auto-complete-auctex auto-complete popup yasnippet auto-complete-c-headers auto-complete popup auto-complete-chunk auto-complete popup auto-complete-clang auto-complete popup dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-paredit paredit evil goto-chg undo-tree evil-surround evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash highlight-current-line json-mode json-snatcher json-reformat json-reformat json-rpc json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nodejs-repl org org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup paredit pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree react-snippets yasnippet skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash undo-tree visual-regexp web-mode yasnippet yaxception)
-
+;; '(helm async helm helm-cmd-t helm-cmd-t paredit paredit web-mode web-mode ac-dabbrev ac-helm popup auto-complete popup helm async ac-html auto-complete popup ac-js2 skewer-mode js2-mode simple-httpd js2-mode auto-complete-auctex auto-complete popup yasnippet auto-complete-c-headers auto-complete popup auto-complete-chunk auto-complete popup auto-complete-clang auto-complete popup dash-at-point evil-leader evil goto-chg undo-tree evil-nerd-commenter evil-org org evil goto-chg undo-tree evil-paredit paredit evil goto-chg undo-tree evil-surround evil-visual-mark-mode dash evil goto-chg undo-tree evil-visualstar evil goto-chg undo-tree flycheck-rust dash flycheck let-alist pkg-info epl dash go-autocomplete auto-complete popup go-mode golint helm-cmd-t helm-css-scss helm async helm-flycheck helm async flycheck let-alist pkg-info epl dash dash highlight-current-line json-mode json-snatcher json-reformat json-reformat json-rpc json-snatcher less-css-mode let-alist magit git-rebase-mode git-commit-mode markdown-mode monokai-theme nlinum nodejs-repl org org-ac yaxception log4e auto-complete-pcmp yaxception log4e auto-complete popup paredit pkg-info epl popup powerline-evil powerline evil goto-chg undo-tree skewer-mode js2-mode simple-httpd smart-mode-line rich-minority dash undo-tree visual-regexp web-mode yasnippet yaxception)
 ;;    "A list of packages to ensure are installed at launch.")
 
 ;;  (defun prelude-packages-installed-p ()
@@ -80,7 +79,7 @@
       (setq x-meta-keysym 'super
             x-super-keysym 'meta)
       (menu-bar-mode -1)
-      (toggle-frame-fullscreen)
+      ;; (toggle-frame-fullscreen)
       ))
 
 ;; mac
