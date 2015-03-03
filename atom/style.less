@@ -1,0 +1,19 @@
+ @font-size: 15px;
+ html, body, .tree-view, .tab-bar .tab {
+   font-size: @font-size;
+    -webkit-font-smoothing: antialiased;
+ }
+
+.tree-view {
+}
+
+// style the background and foreground colors on the atom-text-editor-element
+// itself
+atom-text-editor {
+    -webkit-font-smoothing: antialiased;
+}
+
+// To style other content in the text editor's shadow DOM, use the ::shadow
+// expression
+atom-text-editor::shadow .cursor {
+}
