@@ -1,0 +1,21 @@
+'.platform-darwin':
+  'cmd-\\': 'tree-view:toggle'
+
+'atom-workspace atom-text-editor:not([mini])':
+  'cmd-/': 'editor:toggle-line-comments'
+
+'.editor':
+  'cmd->': 'atom-alignment:align'
+
+'body':
+  'cmd-1': 'pane:close-other-item'
+  'cmd-2': 'pane:split-down'
+  'cmd-3': 'pane:split-right'
+  'cmd-0': 'pane:close'
+  'cmd-o': 'window:focus-next-pane'
+
+'.platform-darwin .workspace':
+  'cmd-m': 'atomatigit:show'
+
+'.platform-darwin .atomatigit':
+  'cmd-m': 'atomatigit:close'
