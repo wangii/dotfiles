@@ -1,10 +1,13 @@
+# Your keymap
+#
+
 '.platform-darwin':
   'cmd-\\': 'tree-view:toggle'
 
 'atom-workspace atom-text-editor:not([mini])':
   'cmd-/': 'editor:toggle-line-comments'
 
-'.editor':
+'atom-text-editor':
   'cmd->': 'atom-alignment:align'
 
 'body':
@@ -14,8 +17,8 @@
   'cmd-0': 'pane:close'
   'cmd-o': 'window:focus-next-pane'
 
-'.platform-darwin .workspace':
-  'cmd-m': 'atomatigit:show'
+'.platform-darwin atom-workspace':
+  'cmd-m': 'atomatigit:toggle'
 
 '.platform-darwin .atomatigit':
-  'cmd-m': 'atomatigit:close'
+  'cmd-m': 'atomatigit:toggle'
