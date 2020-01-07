@@ -1,6 +1,7 @@
 
 # 
 colorscheme zenburn
+
 # change status bar to top
 set-option global ui_options ncurses_status_on_top=yes ncurses_assistant=none ncurses_enable_mouse=yes
 
@@ -18,21 +19,41 @@ map -docstring "fzf" global user t ':fzf-mode<ret>'
 map global normal D '<a-l>d' -docstring 'delete to end of line'
 map global normal = :format<ret> -docstring 'format buffer'
 
-# screen/pane management
-define-command vsp 'tmux-terminal-horizontal kak -c %val{session}'
-define-command hsp 'tmux-terminal-vertical kak -c %val{session}'
-define-command tmux-select-pane -params 1.. %{
-    evaluate-commands %sh{
-        TMUX="${kak_client_env_TMUX}" tmux select-pane "$@" > /dev/null
-    }
+hook global KakBegin .* %sh{
+    if [ "$TERM_PROGRAM" = "iTerm.app" ] && [ -z "$TMUX" ]; then
+        echo "require-module iterm-win"
+    fi
+
+    if [ -n "$TMUX" ]; then
+        echo "require-module tmux-win"
+    fi
 }
 
-map global user h ':tmux-select-pane -L<ret>'
-map global user l ':tmux-select-pane -R<ret>'
-map global user k ':tmux-select-pane -U<ret>'
-map global user j ':tmux-select-pane -D<ret>'
+provide-module tmux-win %{
+    # for tmux
+    # screen/pane management
+    define-command vsp 'tmux-terminal-horizontal kak -c %val{session}'
+    define-command hsp 'tmux-terminal-vertical kak -c %val{session}'
+    define-command tmux-select-pane -params 1.. %{
+        evaluate-commands %sh{
+            TMUX="${kak_client_env_TMUX}" tmux select-pane "$@" > /dev/null
+        }
+    }
 
-define-command term 'tmux-repl-vertical fish'
+    map global user h ':tmux-select-pane -L<ret>'
+    map global user l ':tmux-select-pane -R<ret>'
+    map global user k ':tmux-select-pane -U<ret>'
+    map global user j ':tmux-select-pane -D<ret>'
+
+    define-command term 'tmux-repl-vertical fish'
+}
+
+provide-module iterm-win %{
+    # for iterm:
+    define-command vsp 'iterm-terminal-vertical kak -c %val{session}'
+    define-command sp 'iterm-terminal-horizontal kak -c %val{session}'
+    define-command term 'iterm-terminal-horizontal fish'
+}
 
 # tab to completions
 hook global WinCreate .* %{
@@ -50,7 +71,6 @@ hook global WinCreate .* %{
 
 # plugins
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
-
 plug "andreyorst/fzf.kak"
 # plug "andreyorst/fzf.kak" defer "fzf" %{
 # 	require-module fzf
@@ -68,7 +88,7 @@ plug "andreyorst/fzf.kak"
 eval %sh{kak-lsp --kakoune -s $kak_session --config ~/.config/kak/kak-lsp.toml}
 
 hook global WinSetOption filetype=(c|cpp|objc|objcpp) %{
-    set window formatcmd 'clang-format-9'
+    set window formatcmd 'clang-format'
     lsp-enable-window
     lsp-auto-signature-help-enable
     clang-disable-autocomplete
@@ -78,6 +98,7 @@ hook global WinSetOption filetype=(c|cpp|objc|objcpp) %{
 }
 
 hook global WinSetOption filetype=(go) %{
+	set-option window formatcmd "gofmt"
     lsp-enable-window
     lsp-auto-signature-help-enable
 	lsp-auto-hover-enable
