@@ -1,6 +1,7 @@
 
 # 
-colorscheme zenburn
+# colorscheme zenburn
+colorscheme github
 
 # change status bar to top
 set-option global ui_options ncurses_status_on_top=yes ncurses_assistant=none ncurses_enable_mouse=yes
@@ -71,18 +72,11 @@ hook global WinCreate .* %{
 
 # plugins
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
-plug "andreyorst/fzf.kak"
-# plug "andreyorst/fzf.kak" defer "fzf" %{
-# 	require-module fzf
-# 	set-option global termcmd "kterm -e sh -c"
-# }
 
-# plug "andreyorst/powerline.kak" defer "powerline" %{
-#     powerline-separator triangle
-#     set-option global powerline_format 'powerline-format git bufname filetype mode_info line_column position'
-#     powerline-toggle line_column off
-#     powerline-theme gruvbox
-# }
+plug "andreyorst/fzf.kak"
+hook global ModuleLoaded fzf %{
+	set-option global fzf_file_command 'git ls-files --exclude-standard --others --cached'
+}
 
 ## lsp
 eval %sh{kak-lsp --kakoune -s $kak_session --config ~/.config/kak/kak-lsp.toml}
