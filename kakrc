@@ -1,7 +1,7 @@
 
 # 
-# colorscheme zenburn
-colorscheme github
+colorscheme zenburn
+# colorscheme github
 
 # change status bar to top
 set-option global ui_options ncurses_status_on_top=yes ncurses_assistant=none ncurses_enable_mouse=yes
@@ -59,6 +59,9 @@ provide-module iterm-win %{
 # tab to completions
 hook global WinCreate .* %{
 
+	set-option global termcmd 'uxterm -fa MonoSpace -fs 13 -e sh -c'
+
+	# use spc+/ to toggle comment
     hook window InsertCompletionShow .* %{
             map window insert <tab> <c-n>
             map window insert <s-tab> <c-p>
@@ -72,17 +75,28 @@ hook global WinCreate .* %{
 
 # plugins
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
 
 plug "andreyorst/fzf.kak"
-hook global ModuleLoaded fzf %{
+hook global ModuleLoaded fzf-file %{
 	set-option global fzf_file_command 'git ls-files --exclude-standard --others --cached'
+	# declare-option str fzf_file_command 'git ls-files --exclude-standard --others --cached'
+}
+
+set-option global windowing_modules 'x11'
+plug 'delapouite/kakoune-i3' %{
+      # Suggested mapping
+	map global user 3 ': enter-user-mode i3<ret>' -docstring 'i3 mode'
+
+    alias global vsp i3-new-right
+    alias global sp i3-new-down
 }
 
 ## lsp
 eval %sh{kak-lsp --kakoune -s $kak_session --config ~/.config/kak/kak-lsp.toml}
 
 hook global WinSetOption filetype=(c|cpp|objc|objcpp) %{
-    set window formatcmd 'clang-format'
+    set window formatcmd 'clang-format13'
     lsp-enable-window
     lsp-auto-signature-help-enable
     clang-disable-autocomplete
