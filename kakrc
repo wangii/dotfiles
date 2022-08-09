@@ -59,7 +59,7 @@ provide-module iterm-win %{
 # tab to completions
 hook global WinCreate .* %{
 
-	set-option global termcmd 'uxterm -fa MonoSpace -fs 13 -e sh -c'
+	set-option global termcmd "uxterm -e sh -c"
 
 	# use spc+/ to toggle comment
     hook window InsertCompletionShow .* %{
@@ -79,8 +79,13 @@ plug "andreyorst/plug.kak" noload
 
 plug "andreyorst/fzf.kak"
 hook global ModuleLoaded fzf-file %{
-	set-option global fzf_file_command 'git ls-files --exclude-standard --others --cached'
-	# declare-option str fzf_file_command 'git ls-files --exclude-standard --others --cached'
+	# set-option global fzf_file_command 'git ls-files --exclude-standard --others --cached'
+	# set-option global fzf_file_command 'git ls-files'
+    hook global WinCreate .* %sh{
+        if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        	echo "set-option window fzf_file_command 'git ls-files'"
+        fi
+    }
 }
 
 set-option global windowing_modules 'x11'
