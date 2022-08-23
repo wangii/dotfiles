@@ -19,6 +19,7 @@ map -docstring "fzf" global user t ':fzf-mode<ret>'
 # vim old habits
 map global normal D '<a-l>d' -docstring 'delete to end of line'
 map global normal = :format<ret> -docstring 'format buffer'
+alias global W write 
 
 hook global KakBegin .* %sh{
     if [ "$TERM_PROGRAM" = "iTerm.app" ] && [ -z "$TMUX" ]; then
@@ -29,6 +30,10 @@ hook global KakBegin .* %sh{
         echo "require-module tmux-win"
     fi
 }
+
+# hook global BufWritePre filetype=(c|cpp|objc|objcpp) %{
+#     format
+# }
 
 provide-module tmux-win %{
     # for tmux
@@ -59,7 +64,8 @@ provide-module iterm-win %{
 # tab to completions
 hook global WinCreate .* %{
 
-	set-option global termcmd "uxterm -e sh -c"
+	# set-option global termcmd "uxterm -e sh -c"
+	set-option global termcmd "alacritty msg create-window --command sh -c"
 
 	# use spc+/ to toggle comment
     hook window InsertCompletionShow .* %{
@@ -75,7 +81,10 @@ hook global WinCreate .* %{
 
 # plugins
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
+
 plug "andreyorst/plug.kak" noload
+plug "Ersikan/bookmarks.kak"
+hook global WinCreate .* bookmarks-enable
 
 plug "andreyorst/fzf.kak"
 hook global ModuleLoaded fzf-file %{
@@ -107,7 +116,11 @@ hook global WinSetOption filetype=(c|cpp|objc|objcpp) %{
     clang-disable-autocomplete
 	lsp-auto-hover-enable
 	lsp-auto-hover-insert-mode-enable
-    map -docstring 'jump to counter-part file' window user c ':cpp-alternative-file<ret>' 
+    map -docstring 'jump to counter-part file' window user c ':cpp-alternative-file<ret>'
+
+    hook buffer BufWritePre .* %{
+    	format
+    }
 }
 
 hook global WinSetOption filetype=(go) %{
@@ -116,4 +129,8 @@ hook global WinSetOption filetype=(go) %{
     lsp-auto-signature-help-enable
 	lsp-auto-hover-enable
 	lsp-auto-hover-insert-mode-enable
+
+    hook buffer BufWritePre .* %{
+    	format
+    }
 }
