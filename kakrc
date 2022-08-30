@@ -1,4 +1,3 @@
-
 # 
 colorscheme zenburn
 # colorscheme github
@@ -113,7 +112,7 @@ hook global WinSetOption filetype=(c|cpp|objc|objcpp) %{
     set window formatcmd 'clang-format13'
     lsp-enable-window
     lsp-auto-signature-help-enable
-    clang-disable-autocomplete
+    # clang-disable-autocomplete
 	lsp-auto-hover-enable
 	lsp-auto-hover-insert-mode-enable
     map -docstring 'jump to counter-part file' window user c ':cpp-alternative-file<ret>'
@@ -134,3 +133,101 @@ hook global WinSetOption filetype=(go) %{
     	format
     }
 }
+
+# xmake mode
+declare-user-mode xmake
+define-command xmake-fn -hidden -params 1 %{
+    evaluate-commands %sh{
+    	pipe=/tmp/xmake.kak_p
+        if [ ! -p ${pipe} ]; then
+            mkfifo ${pipe}
+        fi
+        echo "edit -fifo ${pipe} -scroll *xmake*"
+        echo "ansi-enable"
+	    (eval $1>${pipe} 2>&1 &) >/dev/null 2>&1 </dev/null
+    }
+}
+
+define-command xmake-clean -docstring "clean up" %{
+	xmake-fn "xmake c"
+}
+
+define-command xmake-build -docstring "build" %{
+    xmake-fn "xmake b -v"
+}
+
+map global xmake c :xmake-clean<ret> -docstring "clean"
+map global xmake b :xmake-build<ret> -docstring "build"
+
+map global user x ':enter-user-mode xmake<ret>' -docstring 'xmake'
+
+# kak-ansi: https://github.com/eraserhd/kak-ansi 
+declare-option -hidden range-specs ansi_color_ranges
+declare-option -hidden str ansi_command_file
+declare-option -hidden str ansi_filter %sh{
+    # filterdir="$(dirname $kak_source)/.."
+    # filter="${filterdir}/kak-ansi-filter"
+    # if ! [ -x "${filter}" ]; then
+    #     ( cd "$filterdir" && ${CC-c99} -o kak-ansi-filter kak-ansi-filter.c )
+    #     if ! [ -x "${filter}" ]; then
+    #         filter=$(command -v cat)
+    #     fi
+    # fi
+    # printf '%s' "$filter"
+    printf '~/.local/bin/kak-ansi-filter'
+}
+
+define-command \
+    -docstring %{ansi-render-selection: colorize ANSI codes contained inside selection
+
+After highlighters are added to colorize the buffer, the ANSI codes
+are removed.} \
+    -params 0 \
+    ansi-render-selection %{
+    try %{
+        add-highlighter buffer/ansi ranges ansi_color_ranges
+        set-option buffer ansi_color_ranges %val{timestamp}
+        set-option buffer ansi_command_file %sh{mktemp}
+    }
+    execute-keys "|%opt{ansi_filter} -range %val{selection_desc} 2>%opt{ansi_command_file}<ret>"
+    update-option buffer ansi_color_ranges
+    source "%opt{ansi_command_file}"
+}
+
+define-command \
+    -docstring %{ansi-render: colorize buffer by using ANSI codes  After highlighters are added to colorize the buffer, the ANSI codes are removed.} \
+    -params 0 \
+    ansi-render %{
+    evaluate-commands -draft %{
+        execute-keys '%'
+        ansi-render-selection
+    }
+}
+
+define-command \
+    -docstring %{ansi-clear: clear highlighting for current buffer.} \
+    -params 0 \
+    ansi-clear %{
+    set-option buffer ansi_color_ranges %val{timestamp}
+}
+
+define-command \
+    -docstring %{ansi-enable: start rendering new fifo data in current buffer.} \
+    -params 0 \
+    ansi-enable %{
+    hook -group ansi buffer BufReadFifo .* %{
+        evaluate-commands -draft %{
+            select "%val{hook_param}"
+            ansi-render-selection
+        }
+    }
+}
+
+define-command \
+    -docstring %{ansi-disable: stop rendering new fifo content in current buffer.} \
+    -params 0 \
+    ansi-disable %{
+        remove-hooks buffer ansi
+    }
+
+hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' ansi-enable
