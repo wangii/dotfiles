@@ -19,6 +19,7 @@ map -docstring "fzf" global user t ':fzf-mode<ret>'
 map global normal D '<a-l>d' -docstring 'delete to end of line'
 map global normal = :format<ret> -docstring 'format buffer'
 alias global W write 
+alias global Q quit 
 
 hook global KakBegin .* %sh{
     if [ "$TERM_PROGRAM" = "iTerm.app" ] && [ -z "$TMUX" ]; then
@@ -156,25 +157,31 @@ define-command xmake-build -docstring "build" %{
     xmake-fn "xmake b -v"
 }
 
+define-command xmake-gen-json -docstring "generate compile command" %{
+    xmake-fn "xmake project -k compile_commands -v"
+}
+
 map global xmake c :xmake-clean<ret> -docstring "clean"
 map global xmake b :xmake-build<ret> -docstring "build"
+map global xmake g :xmake-gen-json<ret> -docstring "gen compile cmds"
 
 map global user x ':enter-user-mode xmake<ret>' -docstring 'xmake'
 
 # kak-ansi: https://github.com/eraserhd/kak-ansi 
+declare-option -hidden str kak_ansi_filter_path %sh{ dirname "$kak_source" }
+
 declare-option -hidden range-specs ansi_color_ranges
 declare-option -hidden str ansi_command_file
 declare-option -hidden str ansi_filter %sh{
-    # filterdir="$(dirname $kak_source)/.."
-    # filter="${filterdir}/kak-ansi-filter"
-    # if ! [ -x "${filter}" ]; then
-    #     ( cd "$filterdir" && ${CC-c99} -o kak-ansi-filter kak-ansi-filter.c )
-    #     if ! [ -x "${filter}" ]; then
-    #         filter=$(command -v cat)
-    #     fi
-    # fi
-    # printf '%s' "$filter"
-    printf '~/.local/bin/kak-ansi-filter'
+    filter="${kak_opt_kak_ansi_filter_path}/kak-ansi-filter"
+    if ! [ -x "${filter}" ]; then
+        ( cd "$filterdir" && ${CC-c99} -o kak-ansi-filter kak-ansi-filter.c )
+        if ! [ -x "${filter}" ]; then
+            filter=$(command -v cat)
+        fi
+    fi
+    printf '%s' "$filter"
+    #printf '~/.local/bin/kak-ansi-filter'
 }
 
 define-command \
@@ -231,3 +238,27 @@ define-command \
     }
 
 hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' ansi-enable
+
+# rofi
+declare-user-mode rofi
+
+define-command rofi-buffers \
+-docstring 'Select an open buffer using Rofi' %{ evaluate-commands %sh{
+        BUFFER=$(printf "%s\n" "${kak_buflist}" | tr " " "\n" | rofi -dmenu -font 'Consolas 18'| tr -d \')
+        if [ -n "$BUFFER" ]; then
+            printf "%s\n" "buffer ${BUFFER}"
+        fi
+}}
+
+define-command rofi-files \
+-docstring 'Select files in project using Ag and Rofi' %{nop %sh{
+        FILE=$(ag -g "" | rofi -dmenu -font 'Consolas 18')
+        if [ -n "$FILE" ]; then
+            printf 'eval -client %%{%s} edit %%{%s}\n' "${kak_client}" "${FILE}" | kak -p "${kak_session}"
+		fi
+}}
+
+map global rofi b :rofi-buffers<ret> -docstring "buffers"
+map global rofi f :rofi-files<ret> -docstring "files"
+
+map global user r ':enter-user-mode rofi<ret>' -docstring 'rofi'
