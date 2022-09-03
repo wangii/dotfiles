@@ -18,7 +18,7 @@ set $mod Mod4
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 # font pango:DejaVu Sans Mono 12
-font pango:Aurulent Sans Mono 13
+font pango:Aurulent Sans Mono 12
 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
@@ -48,7 +48,9 @@ floating_modifier $mod
 # start a terminal
 # bindsym $mod+Return exec io.elementary.terminal
 # bindsym $mod+Return exec "uxterm -fa MonoSpace -fs 13"
-bindsym $mod+Return exec "uxterm -fa 'Aurulent Sans Mono' -fs 13"
+# bindsym $mod+Return exec "uxterm -fa 'Aurulent Sans Mono' -fs 13 -bg black -fg white"
+# bindsym $mod+Return exec "uxterm -bg black -fg white +cm"
+bindsym $mod+Return exec "alacritty"
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -57,7 +59,7 @@ bindsym $mod+Shift+r exec i3-msg reload
 
 # start dmenu (a program launcher)
 # bindsym $mod+d exec --no-startup-id dmenu_run
-bindsym $mod+d exec "rofi -modi drun,run -show drun -font 'Consolas 18'"
+bindsym $mod+space exec "rofi -modi drun,run -show drun -font 'Consolas 18'"
 
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
@@ -105,7 +107,7 @@ bindsym $mod+s layout toggle split
 bindsym $mod+Shift+space floating toggle
 
 # change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+# bindsym $mod+space focus mode_toggle
 
 # move the currently focused window to the scratchpad
 bindsym $mod+Shift+minus move scratchpad
