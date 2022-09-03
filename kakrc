@@ -106,6 +106,8 @@ plug 'delapouite/kakoune-i3' %{
     alias global sp i3-new-down
 }
 
+plug 'dgrisham/jai.kak'
+
 ## lsp
 eval %sh{kak-lsp --kakoune -s $kak_session --config ~/.config/kak/kak-lsp.toml}
 
