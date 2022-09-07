@@ -169,6 +169,28 @@ map global xmake g :xmake-gen-json<ret> -docstring "gen compile cmds"
 
 map global user x ':enter-user-mode xmake<ret>' -docstring 'xmake'
 
+# jai mode
+declare-user-mode jai
+define-command jai-fn -hidden -params 1 %{
+    evaluate-commands %sh{
+    	pipe=/tmp/jai.kak_p
+        if [ ! -p ${pipe} ]; then
+            mkfifo ${pipe}
+        fi
+        echo "edit -fifo ${pipe} -scroll *jai*"
+        echo "ansi-enable"
+	    (eval $1>${pipe} 2>&1 &) >/dev/null 2>&1 </dev/null
+    }
+}
+
+define-command jai-build -docstring "build" %{
+    # echo %val(buffile)
+    jai-fn "~/jai/bin/jai-linux %val{buffile}"
+}
+
+map global jai b :jai-build<ret> -docstring "build"
+map global user j ':enter-user-mode jai<ret>' -docstring 'jai'
+
 # kak-ansi: https://github.com/eraserhd/kak-ansi 
 declare-option -hidden str kak_ansi_filter_path %sh{ dirname "$kak_source" }
 
@@ -242,7 +264,7 @@ define-command \
 hook -group ansi global BufCreate '\*stdin(?:-\d+)?\*' ansi-enable
 
 # rofi
-declare-user-mode rofi
+# declare-user-mode rofi
 
 define-command rofi-buffers \
 -docstring 'Select an open buffer using Rofi' %{ evaluate-commands %sh{
@@ -260,7 +282,8 @@ define-command rofi-files \
 		fi
 }}
 
-map global rofi b :rofi-buffers<ret> -docstring "buffers"
-map global rofi f :rofi-files<ret> -docstring "files"
+# map global rofi b :rofi-buffers<ret> -docstring "buffers"
+# map global rofi f :rofi-files<ret> -docstring "files"
 
-map global user r ':enter-user-mode rofi<ret>' -docstring 'rofi'
+# map global user r ':enter-user-mode rofi<ret>' -docstring 'rofi'
+map global user r ':rofi-buffers<ret>' -docstring 'rofi buffers'
