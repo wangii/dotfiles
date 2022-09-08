@@ -3,7 +3,8 @@ colorscheme zenburn
 # colorscheme github
 
 # change status bar to top
-set-option global ui_options ncurses_status_on_top=yes ncurses_assistant=none ncurses_enable_mouse=yes
+# set-option global ui_options ncurses_status_on_top=yes ncurses_assistant=none ncurses_enable_mouse=yes
+set-option global ui_options terminal_status_on_top=yes terminal_assistant=none 
 
 set-option global tabstop 4
 set-option global indentwidth 4
@@ -19,47 +20,10 @@ map -docstring "fzf" global user t ':fzf-mode<ret>'
 map global normal D '<a-l>d' -docstring 'delete to end of line'
 map global normal = :format<ret> -docstring 'format buffer'
 alias global W write 
-alias global Q quit 
+alias global Q quit
 
-hook global KakBegin .* %sh{
-    if [ "$TERM_PROGRAM" = "iTerm.app" ] && [ -z "$TMUX" ]; then
-        echo "require-module iterm-win"
-    fi
-
-    if [ -n "$TMUX" ]; then
-        echo "require-module tmux-win"
-    fi
-}
-
-# hook global BufWritePre filetype=(c|cpp|objc|objcpp) %{
-#     format
-# }
-
-provide-module tmux-win %{
-    # for tmux
-    # screen/pane management
-    define-command vsp 'tmux-terminal-horizontal kak -c %val{session}'
-    define-command hsp 'tmux-terminal-vertical kak -c %val{session}'
-    define-command tmux-select-pane -params 1.. %{
-        evaluate-commands %sh{
-            TMUX="${kak_client_env_TMUX}" tmux select-pane "$@" > /dev/null
-        }
-    }
-
-    map global user h ':tmux-select-pane -L<ret>'
-    map global user l ':tmux-select-pane -R<ret>'
-    map global user k ':tmux-select-pane -U<ret>'
-    map global user j ':tmux-select-pane -D<ret>'
-
-    define-command term 'tmux-repl-vertical fish'
-}
-
-provide-module iterm-win %{
-    # for iterm:
-    define-command vsp 'iterm-terminal-vertical kak -c %val{session}'
-    define-command sp 'iterm-terminal-horizontal kak -c %val{session}'
-    define-command term 'iterm-terminal-horizontal fish'
-}
+map global normal <c-left> :buffer-previous<ret>
+map global normal <c-right> :buffer-next<ret>
 
 # tab to completions
 hook global WinCreate .* %{
@@ -83,8 +47,8 @@ hook global WinCreate .* %{
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
 plug "andreyorst/plug.kak" noload
-plug "Ersikan/bookmarks.kak"
-hook global WinCreate .* bookmarks-enable
+# plug "Ersikan/bookmarks.kak"
+# hook global WinCreate .* bookmarks-enable
 
 plug "andreyorst/fzf.kak"
 hook global ModuleLoaded fzf-file %{
@@ -129,7 +93,7 @@ hook global WinSetOption filetype=(go) %{
 	set-option window formatcmd "gofmt"
     lsp-enable-window
     lsp-auto-signature-help-enable
-	lsp-auto-hover-enable
+	lsp-auto-hover-enabl window H buffer-previouse
 	lsp-auto-hover-insert-mode-enable
 
     hook buffer BufWritePre .* %{
@@ -190,6 +154,10 @@ define-command jai-build -docstring "build" %{
 
 map global jai b :jai-build<ret> -docstring "build"
 map global user j ':enter-user-mode jai<ret>' -docstring 'jai'
+
+hook global BufCreate \*jai\* %{
+	map buffer normal < :buffer-previous<ret>
+}
 
 # kak-ansi: https://github.com/eraserhd/kak-ansi 
 declare-option -hidden str kak_ansi_filter_path %sh{ dirname "$kak_source" }
@@ -286,4 +254,4 @@ define-command rofi-files \
 # map global rofi f :rofi-files<ret> -docstring "files"
 
 # map global user r ':enter-user-mode rofi<ret>' -docstring 'rofi'
-map global user r ':rofi-buffers<ret>' -docstring 'rofi buffers'
+map global user b ':rofi-buffers<ret>' -docstring 'rofi buffers'
