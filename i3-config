@@ -18,11 +18,17 @@ set $mod Mod4
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 # font pango:DejaVu Sans Mono 12
-font pango:Aurulent Sans Mono 12
+font pango:Aurulent Sans Mono 10
 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 #exec --no-startup-id dex --autostart --environment i3
+
+# change mouse
+exec xmodmap -e "pointer = 3 2 1"
+# change keyboard
+# exec setxkbmap 'gb(mac)'
+exec setxkbmap 'us'
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
@@ -59,7 +65,7 @@ bindsym $mod+Shift+r exec i3-msg reload
 
 # start dmenu (a program launcher)
 # bindsym $mod+d exec --no-startup-id dmenu_run
-bindsym $mod+space exec "rofi -modi drun,run -show drun -font 'Consolas 18'"
+bindsym $mod+space exec "rofi -modi drun,run -show drun -font 'Consolas 12'"
 
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
@@ -203,5 +209,6 @@ bindsym $mod+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3status
+    position top
+	status_command i3status
 }
